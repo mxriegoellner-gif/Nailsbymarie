@@ -180,7 +180,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzcCI10LqdNRdDU5TK8ZQosAkLLVL-HjV8idvJKwE-vFiUVM58YUJc3sBI6p8miSQEnw/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwr2pogzledS8ZgVqdHqvyetTDh4xsGCjS7cYfiuMAFfdPDBk_OmEmwhP1Di9sEO1QhEw/exec";
 
         const SERVICES = [
             { id: 'gelx_neu', name: 'Gel X Neumodellage', duration: 120, price: 25 },
@@ -267,7 +267,7 @@
             timeSelect.innerHTML = '<option value="">Prüfe verfügbare Zeiten...</option>';
 
             try {
-                const response = await fetch(`${GOOGLE_SCRIPT_URL}?date=${dateInput}`);
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?date=${dateInput}&duration=${selectedService.duration}`);
                 const bookedTimes = await response.json();
 
                 const freeTimes = possibleTimes.filter(t => !bookedTimes.includes(t));
