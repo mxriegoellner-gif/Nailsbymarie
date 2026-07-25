@@ -35,13 +35,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        .glass-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(242, 232, 229, 0.8);
-        }
-    </style>
 </head>
 <body class="bg-rosebrand-50 text-stone-800 font-sans antialiased selection:bg-rosebrand-500 selection:text-white">
 
@@ -76,7 +69,7 @@
                 <span class="italic font-normal text-rosebrand-600">Dein Statement.</span>
             </h1>
             <p class="text-stone-600 text-sm sm:text-base max-w-lg mx-auto font-normal leading-relaxed">
-                Buche deinen Wunschtermin für hochwertige Gelnägel bequem online. Wähle deine Behandlung und sichere dir deinen Termin.
+                Buche deinen Wunschtermin für hochwertige Gelnägel bequem online.
             </p>
             <div class="pt-2">
                 <a href="#booking" class="inline-flex items-center gap-2 px-8 py-4 bg-rosebrand-500 hover:bg-rosebrand-600 text-white rounded-2xl text-base font-semibold shadow-lg shadow-rosebrand-500/30 transition-all">
@@ -124,12 +117,7 @@
                         <div>
                             <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Uhrzeit wählen *</label>
                             <select id="booking-time" required class="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-rosebrand-500 outline-none text-sm bg-stone-50/50">
-                                <option value="">Bitte wählen...</option>
-                                <option value="09:00">09:00 Uhr</option>
-                                <option value="10:30">10:30 Uhr</option>
-                                <option value="13:00">13:00 Uhr</option>
-                                <option value="14:30">14:30 Uhr</option>
-                                <option value="16:00">16:00 Uhr</option>
+                                <option value="">Bitte zuerst Datum wählen</option>
                             </select>
                         </div>
                     </div>
@@ -139,9 +127,6 @@
                         <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">3. Deine Kontaktdaten</label>
                         <div>
                             <input type="text" id="cust-name" required placeholder="Vor- & Nachname *" class="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-rosebrand-500 outline-none text-sm">
-                        </div>
-                        <div>
-                            <input type="email" id="cust-email" required placeholder="E-Mail-Adresse *" class="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-rosebrand-500 outline-none text-sm">
                         </div>
                         <div>
                             <input type="tel" id="cust-phone" required placeholder="Telefonnummer (für Rückfragen) *" class="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-rosebrand-500 outline-none text-sm">
@@ -167,8 +152,8 @@
                 <i data-lucide="check" class="w-7 h-7"></i>
             </div>
             <div>
-                <h3 class="font-serif text-2xl font-bold text-stone-900">Termin erfolgreich gebucht!</h3>
-                <p class="text-stone-600 text-xs mt-1">Vielen Dank für deine Buchung. Du erhältst in Kürze eine Bestätigung.</p>
+                <h3 class="font-serif text-2xl font-bold text-stone-900">Termin gebucht!</h3>
+                <p class="text-stone-600 text-xs mt-1">Vielen Dank für deine Buchung. Ich freue mich auf dich!</p>
             </div>
 
             <div class="bg-rosebrand-50 p-4 rounded-2xl text-left text-xs space-y-2 border border-rosebrand-100">
@@ -184,7 +169,9 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznNfADqEq3Bf8F90u06EjlzwUZcKmyKMRsScjUs_LhbgdCmC-WGO6WHN_j-_rvyInlZQ/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnp4pNUEh33EINLz1XynjJMwgUxr31ReN94NMV9IVSXUyUd4VXx8JOa-1-MugTeaiY_w/exec";
+
+        const ALL_TIMES = ["09:00", "10:30", "13:00", "14:30", "16:00"];
 
         const SERVICES = [
             { id: 'neuanlage', name: 'Neuanlage Gelnägel', duration: 90, price: 65 },
@@ -228,11 +215,35 @@
             `).join('');
         }
 
-        function onDateSelected() {
-            const date = new Date(document.getElementById('booking-date').value);
+        async function onDateSelected() {
+            const dateInput = document.getElementById('booking-date').value;
+            const timeSelect = document.getElementById('booking-time');
+            
+            const date = new Date(dateInput);
             if (date.getDay() === 0) {
                 alert('Sonntags ist geschlossen. Bitte wähle einen anderen Tag.');
                 document.getElementById('booking-date').value = '';
+                timeSelect.innerHTML = '<option value="">Bitte zuerst Datum wählen</option>';
+                return;
+            }
+
+            timeSelect.innerHTML = '<option value="">Prüfe verfügbare Zeiten...</option>';
+
+            try {
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?date=${dateInput}`);
+                const bookedTimes = await response.json();
+
+                const freeTimes = ALL_TIMES.filter(t => !bookedTimes.includes(t));
+
+                if (freeTimes.length === 0) {
+                    timeSelect.innerHTML = '<option value="">Leider alle Termine ausgebucht</option>';
+                } else {
+                    timeSelect.innerHTML = '<option value="">Bitte wählen...</option>' + 
+                        freeTimes.map(t => `<option value="${t}">${t} Uhr</option>`).join('');
+                }
+            } catch (err) {
+                timeSelect.innerHTML = '<option value="">Bitte wählen...</option>' + 
+                    ALL_TIMES.map(t => `<option value="${t}">${t} Uhr</option>`).join('');
             }
         }
 
@@ -247,7 +258,6 @@
             const dateVal = document.getElementById('booking-date').value;
             const timeVal = document.getElementById('booking-time').value;
             const nameVal = document.getElementById('cust-name').value;
-            const emailVal = document.getElementById('cust-email').value;
             const phoneVal = document.getElementById('cust-phone').value;
             const notesVal = document.getElementById('cust-notes').value;
 
@@ -257,7 +267,6 @@
                 date: dateVal,
                 time: timeVal,
                 name: nameVal,
-                email: emailVal,
                 phone: phoneVal,
                 notes: notesVal
             };
