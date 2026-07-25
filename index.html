@@ -180,7 +180,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwr2pogzledS8ZgVqdHqvyetTDh4xsGCjS7cYfiuMAFfdPDBk_OmEmwhP1Di9sEO1QhEw/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxjKciZ8BjVNPNunOT_H-DjGvl9bTmyHNE9dcYnBDdJMXJP2s5SCi6VQhKe1y59j7X2ow/exec";
 
         const SERVICES = [
             { id: 'gelx_neu', name: 'Gel X Neumodellage', duration: 120, price: 25 },
@@ -202,6 +202,14 @@
             document.getElementById('booking-date').min = today;
         });
 
+        function selectService(index) {
+            selectedService = SERVICES[index];
+            const dateInput = document.getElementById('booking-date').value;
+            if (dateInput) {
+                onDateSelected();
+            }
+        }
+
         function renderCards() {
             document.getElementById('services-cards').innerHTML = SERVICES.map(s => `
                 <div class="bg-white p-5 rounded-2xl border border-rosebrand-100 flex justify-between items-center shadow-sm">
@@ -216,7 +224,7 @@
 
         function renderOptions() {
             document.getElementById('service-options-container').innerHTML = SERVICES.map((s, idx) => `
-                <label class="block cursor-pointer" onclick="selectedService = SERVICES[${idx}]">
+                <label class="block cursor-pointer" onclick="selectService(${idx})">
                     <input type="radio" name="service" value="${s.id}" ${idx === 0 ? 'checked' : ''} class="sr-only peer">
                     <div class="p-3.5 rounded-xl border border-stone-200 peer-checked:border-rosebrand-500 peer-checked:bg-rosebrand-50/50 flex justify-between items-center text-sm">
                         <div>
