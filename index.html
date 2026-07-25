@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nailsbymarie | Online Termin buchen</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -28,13 +29,16 @@
             }
         }
     </script>
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="bg-rosebrand-50 text-stone-800 font-sans antialiased selection:bg-rosebrand-500 selection:text-white">
 
+    <!-- Header / Navigation -->
     <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-rosebrand-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
             <a href="#" class="flex items-center gap-2">
@@ -53,6 +57,7 @@
         </div>
     </header>
 
+    <!-- Hero Section -->
     <section class="relative py-12 overflow-hidden bg-gradient-to-b from-white to-rosebrand-50">
         <div class="max-w-4xl mx-auto px-4 text-center space-y-6">
             <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rosebrand-100 text-rosebrand-700 text-xs font-medium border border-rosebrand-200">
@@ -75,6 +80,7 @@
         </div>
     </section>
 
+    <!-- Services Overview -->
     <section class="py-12 bg-white">
         <div class="max-w-4xl mx-auto px-4">
             <div class="text-center mb-6">
@@ -86,6 +92,7 @@
         </div>
     </section>
 
+    <!-- Main Booking Section -->
     <section id="booking" class="py-12 bg-rosebrand-50/50">
         <div class="max-w-2xl mx-auto px-4">
             <div class="text-center mb-8">
@@ -93,14 +100,17 @@
                 <h2 class="font-serif text-3xl font-bold text-rosebrand-900 mt-3">Termin buchen</h2>
             </div>
 
+            <!-- Booking App Card -->
             <div class="bg-white rounded-3xl shadow-xl border border-rosebrand-100 overflow-hidden">
                 <form id="booking-form" onsubmit="handleBookingSubmit(event)" class="p-6 sm:p-8 space-y-6">
                     
+                    <!-- 1. Service -->
                     <div>
                         <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">1. Behandlung auswählen *</label>
                         <div class="space-y-2.5" id="service-options-container"></div>
                     </div>
 
+                    <!-- 2. Date & Time -->
                     <div class="grid sm:grid-cols-2 gap-4 pt-2">
                         <div>
                             <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">2. Datum wählen *</label>
@@ -114,6 +124,7 @@
                         </div>
                     </div>
 
+                    <!-- 3. Customer Info -->
                     <div class="space-y-4 pt-2 border-t border-stone-100">
                         <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">3. Deine Kontaktdaten</label>
                         <div>
@@ -144,6 +155,7 @@
         </div>
     </section>
 
+    <!-- Success Modal -->
     <div id="success-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 text-center border border-rosebrand-100">
             <div class="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
@@ -167,7 +179,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnp4pNUEh33EINLz1XynjJMwgUxr31ReN94NMV9IVSXUyUd4VXx8JOa-1-MugTeaiY_w/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyaRYrWGwhiRAYTrdCb7TNHiPDXQUZWipC-hCAttdC_SM1caYmfT6hX4sUm_p_SG2xwxg/exec";
 
         const SERVICES = [
             { id: 'gelx_neu', name: 'Gel X Neumodellage', duration: 120, price: 25 },
@@ -216,29 +228,23 @@
             `).join('');
         }
 
-        // Berechnet verfügbare Slots basierend auf dem Datum & Arbeitszeiten
         function getPossibleTimesForDate(dateStr) {
             const date = new Date(dateStr + 'T00:00:00');
-            const dayOfWeek = date.getDay(); // 0 = So, 1 = Mo, ..., 6 = Sa
+            const dayOfWeek = date.getDay();
             
             const phase1End = new Date('2026-08-02T23:59:59');
             const phase2End = new Date('2026-08-16T23:59:59');
 
-            // Phase 1: Bis 02.08. -> Mo-So 10-20 Uhr
             if (date <= phase1End) {
                 return ["10:00", "12:00", "14:00", "16:00", "18:00"];
-            } 
-            // Phase 2: 03.08. bis 16.08. -> Fr 16-20 Uhr, Sa/So 10-20 Uhr
-            else if (date <= phase2End) {
-                if (dayOfWeek === 5) return ["16:00", "18:00"]; // Freitag
-                if (dayOfWeek === 6 || dayOfWeek === 0) return ["10:00", "12:00", "14:00", "16:00", "18:00"]; // Sa / So
-                return []; // unter der Woche geschlossen
-            } 
-            // Phase 3: Ab 17.08. -> Di, Do, Fr 17-20 Uhr & Sa/So 10-20 Uhr
-            else {
-                if (dayOfWeek === 2 || dayOfWeek === 4 || dayOfWeek === 5) return ["17:00", "18:30"]; // Di, Do, Fr
-                if (dayOfWeek === 6 || dayOfWeek === 0) return ["10:00", "12:00", "14:00", "16:00", "18:00"]; // Sa / So
-                return []; // Mo / Mi geschlossen
+            } else if (date <= phase2End) {
+                if (dayOfWeek === 5) return ["16:00", "18:00"];
+                if (dayOfWeek === 6 || dayOfWeek === 0) return ["10:00", "12:00", "14:00", "16:00", "18:00"];
+                return [];
+            } else {
+                if (dayOfWeek === 2 || dayOfWeek === 4 || dayOfWeek === 5) return ["17:00", "18:30"];
+                if (dayOfWeek === 6 || dayOfWeek === 0) return ["10:00", "12:00", "14:00", "16:00", "18:00"];
+                return [];
             }
         }
 
@@ -277,6 +283,15 @@
             }
         }
 
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
         async function handleBookingSubmit(e) {
             e.preventDefault();
             
@@ -292,6 +307,21 @@
             const phoneVal = document.getElementById('cust-phone').value;
             const notesVal = document.getElementById('cust-notes').value;
 
+            const photoFile = document.getElementById('cust-photo').files[0];
+            let photoData = null;
+            let photoName = null;
+            let photoMimeType = null;
+
+            if (photoFile) {
+                try {
+                    photoData = await fileToBase64(photoFile);
+                    photoName = photoFile.name;
+                    photoMimeType = photoFile.type;
+                } catch (err) {
+                    console.error("Fehler beim Lesen des Bildes:", err);
+                }
+            }
+
             const payload = {
                 service: selectedService.name,
                 duration: selectedService.duration,
@@ -299,7 +329,10 @@
                 time: timeVal,
                 name: `${nameVal} (Insta: ${instaVal})`,
                 phone: phoneVal,
-                notes: notesVal
+                notes: notesVal,
+                photoData: photoData,
+                photoName: photoName,
+                photoMimeType: photoMimeType
             };
 
             try {
